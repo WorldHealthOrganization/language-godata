@@ -1,7 +1,7 @@
 {
-  "name": "language-template",
-  "version": "1.0.0",
-  "description": "An Language Package Template for OpenFn",
+  "name": "language-godata",
+  "version": "0.1.0",
+  "description": "An OpenFn adaptor for use with GoData",
   "main": "lib/index.js",
   "scripts": {
     "build": "make",
