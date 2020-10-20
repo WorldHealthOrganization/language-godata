@@ -9,7 +9,7 @@ API.
 
 ## Documentation
 
-- View the documentation at https://openfn.github.io/adaptor/
+- View the documentation at https://openfn.github.io/language-godata/
 - To update the documentation site, run: `./node_modules/.bin/jsdoc --readme ./README.md ./lib -d docs`
 
 ## Helper Functions
