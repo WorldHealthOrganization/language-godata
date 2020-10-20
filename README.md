@@ -43,7 +43,7 @@ createContact({
   "body": {"outbreak": "id", "firstname": "aleksa", ...}
   "headers": {}
 })
-
+```
 ## Development
 
 Clone the repo, run `npm install`.
