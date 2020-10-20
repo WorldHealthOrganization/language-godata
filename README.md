@@ -5,7 +5,11 @@
 An OpenFn **_adaptor_** for building integration jobs for use with the WHO Go.Data
 API.
 
-[Go.Data](https://www.who.int/godata) is an outbreak investigation tool for field data collection during public health emergencies. The tool includes functionality for case investigation, contact follow-up, visualization of chains of transmission including secure data exchange and is designed for flexibility in the field, to adapt to the wide range of outbreak scenarios. 
+[Go.Data](https://www.who.int/godata) is an outbreak investigation tool for
+field data collection during public health emergencies. The tool includes
+functionality for case investigation, contact follow-up, visualization of chains
+of transmission including secure data exchange and is designed for flexibility
+in the field, to adapt to the wide range of outbreak scenarios.
 
 ## Documentation
 
@@ -13,6 +17,7 @@ API.
 - To update the documentation site, run: `./node_modules/.bin/jsdoc --readme ./README.md ./lib -d docs`
 
 ## Helper Functions
+
 ### post(...)
 
 #### sample configuration
@@ -35,8 +40,11 @@ post({
 ```
 
 ### createContact(...)
+
 #### sample expression using operation
+
 _Example to consider for development_
+
 ```js
 createContact({
   "url": "api/outbreaks/{id}/contacts",
@@ -44,6 +52,7 @@ createContact({
   "headers": {}
 })
 ```
+
 ## Development
 
 Clone the repo, run `npm install`.
