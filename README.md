@@ -13,7 +13,7 @@ API.
 - To update the documentation site, run: `./node_modules/.bin/jsdoc --readme ./README.md ./lib -d docs`
 
 ## Helper Functions
-### post
+### post(...)
 
 #### sample configuration
 
@@ -33,6 +33,16 @@ post({
   "headers": {}
 })
 ```
+
+### createContact(...)
+#### sample expression using operation
+_Example to consider for development_
+```js
+createContact({
+  "url": "api/outbreaks/{id}/contacts",
+  "body": {"outbreak": "id", "firstname": "aleksa", ...}
+  "headers": {}
+})
 
 ## Development
 
