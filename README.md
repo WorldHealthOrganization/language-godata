@@ -5,12 +5,15 @@
 An OpenFn **_adaptor_** for building integration jobs for use with the WHO Go.Data
 API.
 
+[Go.Data](https://www.who.int/godata) is an outbreak investigation tool for field data collection during public health emergencies. The tool includes functionality for case investigation, contact follow-up, visualization of chains of transmission including secure data exchange and is designed for flexibility in the field, to adapt to the wide range of outbreak scenarios. 
+
 ## Documentation
 
 - View the documentation at https://openfn.github.io/adaptor/
 - To update the documentation site, run: `./node_modules/.bin/jsdoc --readme ./README.md ./lib -d docs`
 
-## post
+## Helper Functions
+### post
 
 #### sample configuration
 
