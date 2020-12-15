@@ -5,7 +5,6 @@ import {
   expandReferences,
 } from 'language-common';
 import axios from 'axios';
-import { resolve } from 'path';
 
 /**
  * Execute a sequence of operations.
@@ -28,7 +27,7 @@ export function execute(...operations) {
   return state => {
     return commonExecute(
       login,
-      ...operations,
+      ...operations
       /* logout */
     )({ ...initialState, ...state }).catch(e => {
       console.error(e);
@@ -59,12 +58,47 @@ function logout(state) {
   const { host, id } = state.configuration;
   return axios({
     method: 'post',
-    url: `${host}users/logout?access_token=${id}`,
+    url: `${host}/users/logout?access_token=${id}`,
   }).then(() => {
     console.log('logged out');
     delete state.configuration;
     return state;
   });
+}
+
+/**
+ * Fetch the list of contacts
+ * @public
+ * @example
+ *  listContact({}, function (state) {
+ *    console.log(state);
+ *    return state;
+ *  });
+ * @function
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function listContact(params, callback) {
+  return state => {
+    const { host, id } = state.configuration;
+
+    const { headers, body, options, ...rest } = expandReferences(params)(state);
+
+    return axios({
+      method: 'GET',
+      url: `${host}/users?access_token=${id}`,
+    })
+      .then(response => {
+        const nextState = composeNextState(state, response);
+        if (callback) return callback(nextState);
+        return nextState;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
 }
 
 // Note that we expose the entire axios package to the user here.
