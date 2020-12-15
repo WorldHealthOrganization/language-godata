@@ -26,53 +26,45 @@ export function execute(...operations) {
   };
 
   return state => {
-    return commonExecute(...operations)({
-      ...initialState,
-      ...state,
+    return commonExecute(
+      login,
+      ...operations,
+      /* logout */
+    )({ ...initialState, ...state }).catch(e => {
+      console.error(e);
+      /* logout(); */
+      process.exit(1);
     });
   };
 }
 
-/**
- * Make a POST request
- * @example
- * execute(
- *   post(params)
- * )(state)
- * @constructor
- * @param {object} params - data to make the fetch
- * @returns {Operation}
- */
-export function post(params, callback) {
-  return state => {
-    const { baseUrl, username, password } = state.configuration;
-    const { url, body, headers } = expandReferences(params)(state);
+function login(state) {
+  const { host, password, email } = state.configuration;
 
-    return axios({
-      method: 'post',
-      headers: {},
-      params: {},
-      baseURL,
-      url,
-      data: body,
-      auth: { username, password },
-    })
-      .then(response => {
-        console.log(
-          'Printing response...\n',
-          JSON.stringify(response, null, 4) + '\n',
-          'POST succeeded.'
-        );
+  return axios({
+    method: 'post',
+    url: `${host}/users/login`,
+    data: {
+      email,
+      password,
+    },
+  }).then(response => {
+    console.log('Authentication succeeded.');
+    const { id } = response.data;
+    return { ...state, configuration: { host, id } };
+  });
+}
 
-        const nextState = composeNextState(state, response);
-        if (callback) resolve(callback(nextState));
-        resolve(nextState);
-      })
-      .catch(error => {
-        console.log(error);
-        reject(error);
-      });
-  };
+function logout(state) {
+  const { host, id } = state.configuration;
+  return axios({
+    method: 'post',
+    url: `${host}users/logout?access_token=${id}`,
+  }).then(() => {
+    console.log('logged out');
+    delete state.configuration;
+    return state;
+  });
 }
 
 // Note that we expose the entire axios package to the user here.
