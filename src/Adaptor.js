@@ -50,15 +50,15 @@ function login(state) {
   }).then(response => {
     console.log('Authentication succeeded.');
     const { id } = response.data;
-    return { ...state, configuration: { host, id } };
+    return { ...state, configuration: { host, access_token: id } };
   });
 }
 
 function logout(state) {
-  const { host, id } = state.configuration;
+  const { host, access_token } = state.configuration;
   return axios({
     method: 'post',
-    url: `${host}/users/logout?access_token=${id}`,
+    url: `${host}/users/logout?access_token=${access_token}`,
   }).then(() => {
     console.log('logged out');
     delete state.configuration;
@@ -67,27 +67,32 @@ function logout(state) {
 }
 
 /**
- * Fetch the list of contacts
+ * Fetch the list of contacts within a particular outbreak using it's ID.
  * @public
  * @example
- *  listContacts({}, state => {
+ *  listContacts("343d-dc3e", {}, state => {
  *    console.log(state);
  *    return state;
  *  });
  * @function
+ * @param {string} id - Outbreak id
  * @param {object} params - Options, Headers parameters
  * @param {function} callback - (Optional) Callback function
  * @returns {Operation}
  */
-export function listContacts(params, callback) {
+export function listContacts(id, params, callback) {
   return state => {
-    const { host, id } = state.configuration;
+    const { host, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
     return axios({
       method: 'GET',
-      url: `${host}/users?access_token=${id}`,
+      baseURL: host,
+      url: `/outbreaks/${id}/contacts`,
+      params: {
+        access_token,
+      },
     })
       .then(response => {
         const nextState = composeNextState(state, response.data);
@@ -159,7 +164,7 @@ export function getContact(query, params, callback) {
  */
 export function listOutbreaks(params, callback) {
   return state => {
-    const { host, id } = state.configuration;
+    const { host, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
@@ -168,7 +173,7 @@ export function listOutbreaks(params, callback) {
       baseURL: host,
       url: '/outbreaks',
       params: {
-        access_token: id,
+        access_token,
       },
     })
       .then(response => {
@@ -199,7 +204,7 @@ export function listOutbreaks(params, callback) {
  */
 export function getOutbreak(query, params, callback) {
   return state => {
-    const { host, id } = state.configuration;
+    const { host, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
@@ -211,7 +216,7 @@ export function getOutbreak(query, params, callback) {
       url: '/outbreaks',
       params: {
         filter,
-        access_token: id,
+        access_token,
       },
     })
       .then(response => {
