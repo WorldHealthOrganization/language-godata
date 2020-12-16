@@ -67,7 +67,7 @@ function logout(state) {
 }
 
 /**
- * Fetch the list of contacts within a particular outbreak using it's ID.
+ * Fetch the list of contacts within a particular outbreak using its ID.
  * @public
  * @example
  *  listContacts("343d-dc3e", {}, state => {
@@ -217,6 +217,46 @@ export function getOutbreak(query, params, callback) {
       url: '/outbreaks',
       params: {
         filter,
+        access_token,
+      },
+    })
+      .then(response => {
+        const nextState = composeNextState(state, response.data);
+        if (callback) return callback(nextState);
+        return nextState;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
+ * Fetch the list of cases within a particular outbreak using its ID.
+ * @public
+ * @example
+ *  listCases("343d-dc3e", {}, state => {
+ *    console.log(state);
+ *    return state;
+ *  });
+ * @function
+ * @param {string} id - Outbreak id
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function listCases(id, params, callback) {
+  return state => {
+    const { host, access_token } = state.configuration;
+
+    const { headers, body, options, ...rest } = expandReferences(params)(state);
+
+    return axios({
+      method: 'GET',
+      baseURL: host,
+      url: `/outbreaks/${id}/cases`,
+      params: {
         access_token,
       },
     })
