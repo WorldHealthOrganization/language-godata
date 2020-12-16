@@ -70,7 +70,7 @@ function logout(state) {
  * Fetch the list of contacts
  * @public
  * @example
- *  listContact({}, function (state) {
+ *  listContacts({}, state => {
  *    console.log(state);
  *    return state;
  *  });
@@ -79,7 +79,7 @@ function logout(state) {
  * @param {function} callback - (Optional) Callback function
  * @returns {Operation}
  */
-export function listContact(params, callback) {
+export function listContacts(params, callback) {
   return state => {
     const { host, id } = state.configuration;
 
@@ -90,7 +90,7 @@ export function listContact(params, callback) {
       url: `${host}/users?access_token=${id}`,
     })
       .then(response => {
-        const nextState = composeNextState(state, response);
+        const nextState = composeNextState(state, response.data);
         if (callback) return callback(nextState);
         return nextState;
       })
