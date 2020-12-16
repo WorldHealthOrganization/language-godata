@@ -102,6 +102,44 @@ export function listContacts(params, callback) {
 }
 
 /**
+ * Get a specific contact from a query filter
+ * @public
+ * @example
+ *  getContact({"where":{"firstName": "Luca"}}, {}, state => {
+ *    console.log(state.data);
+ *    return state;
+ *  });
+ * @function
+ * @param {object} query - An object with a query filter parameter
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function getContact(query, params, callback) {
+  return state => {
+    const { host, id } = state.configuration;
+
+    const { headers, body, options, ...rest } = expandReferences(params)(state);
+
+    const filter = JSON.stringify(query);
+
+    return axios({
+      method: 'GET',
+      url: `${host}/users?filter=${filter}&access_token=${id}`,
+    })
+      .then(response => {
+        const nextState = composeNextState(state, response.data);
+        if (callback) return callback(nextState);
+        return nextState;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
  * Fetch the list of outbreaks
  * @public
  * @example
