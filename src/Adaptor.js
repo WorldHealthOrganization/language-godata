@@ -124,8 +124,13 @@ export function getContact(query, params, callback) {
     const filter = JSON.stringify(query);
 
     return axios({
+      baseURL: host,
+      url: '/users',
       method: 'GET',
-      url: `${host}/users?filter=${filter}&access_token=${id}`,
+      params: {
+        filter,
+        access_token: id,
+      },
     })
       .then(response => {
         const nextState = composeNextState(state, response.data);
@@ -160,7 +165,11 @@ export function listOutbreaks(params, callback) {
 
     return axios({
       method: 'GET',
-      url: `${host}/outbreaks?access_token=${id}`,
+      baseURL: host,
+      url: '/outbreaks',
+      params: {
+        access_token: id,
+      },
     })
       .then(response => {
         const nextState = composeNextState(state, response.data);
@@ -198,7 +207,12 @@ export function getOutbreak(query, params, callback) {
 
     return axios({
       method: 'GET',
-      url: `${host}/outbreaks?filter=${filter}&access_token=${id}`,
+      baseURL: host,
+      url: '/outbreaks',
+      params: {
+        filter,
+        access_token: id,
+      },
     })
       .then(response => {
         const nextState = composeNextState(state, response.data);
