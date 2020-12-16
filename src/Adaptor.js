@@ -101,6 +101,41 @@ export function listContact(params, callback) {
   };
 }
 
+/**
+ * Fetch the list of outbreaks
+ * @public
+ * @example
+ *  listOutbreaks({}, state => {
+ *    console.log(state.data);
+ *    return state;
+ *  });
+ * @function
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function listOutbreaks(params, callback) {
+  return state => {
+    const { host, id } = state.configuration;
+
+    const { headers, body, options, ...rest } = expandReferences(params)(state);
+
+    return axios({
+      method: 'GET',
+      url: `${host}/outbreaks?access_token=${id}`,
+    })
+      .then(response => {
+        const nextState = composeNextState(state, response.data);
+        if (callback) return callback(nextState);
+        return nextState;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
 // Note that we expose the entire axios package to the user here.
 exports.axios = axios;
 
