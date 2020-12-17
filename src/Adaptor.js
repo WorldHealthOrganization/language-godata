@@ -38,11 +38,11 @@ export function execute(...operations) {
 }
 
 function login(state) {
-  const { host, password, email } = state.configuration;
+  const { apiUrl, password, email } = state.configuration;
 
   return axios({
     method: 'post',
-    url: `${host}/users/login`,
+    url: `${apiUrl}/users/login`,
     data: {
       email,
       password,
@@ -50,15 +50,15 @@ function login(state) {
   }).then(response => {
     console.log('Authentication succeeded.');
     const { id } = response.data;
-    return { ...state, configuration: { host, access_token: id } };
+    return { ...state, configuration: { apiUrl, access_token: id } };
   });
 }
 
 function logout(state) {
-  const { host, access_token } = state.configuration;
+  const { apiUrl, access_token } = state.configuration;
   return axios({
     method: 'post',
-    url: `${host}/users/logout?access_token=${access_token}`,
+    url: `${apiUrl}/users/logout?access_token=${access_token}`,
   }).then(() => {
     console.log('logged out');
     delete state.configuration;
@@ -82,13 +82,13 @@ function logout(state) {
  */
 export function listContacts(id, params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
     return axios({
       method: 'GET',
-      baseURL: host,
+      baseURL: apiUrl,
       url: `/outbreaks/${id}/contacts`,
       params: {
         access_token,
@@ -123,14 +123,14 @@ export function listContacts(id, params, callback) {
  */
 export function getContact(id, query, params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
     const filter = JSON.stringify(query);
 
     return axios({
-      baseURL: host,
+      baseURL: apiUrl,
       url: `/outbreaks/${id}/contacts`,
       method: 'GET',
       params: {
@@ -164,7 +164,7 @@ export function getContact(id, query, params, callback) {
  */
 export function upsertContact(id, externalId, params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { data, headers, body, options, ...rest } = expandReferences(params)(
       state
@@ -176,7 +176,7 @@ export function upsertContact(id, externalId, params, callback) {
     const filter = JSON.stringify(query);
 
     return axios({
-      baseURL: host,
+      baseURL: apiUrl,
       url: `/outbreaks/${id}/contacts`,
       method: 'GET',
       params: {
@@ -193,7 +193,7 @@ export function upsertContact(id, externalId, params, callback) {
           const contactId = response.data[0].id;
           return axios({
             method: 'PUT',
-            baseURL: host,
+            baseURL: apiUrl,
             url: `/outbreaks/${id}/contacts/${contactId}`,
             params: {
               access_token,
@@ -213,7 +213,7 @@ export function upsertContact(id, externalId, params, callback) {
           console.log('No contact found. Performing create.');
           return axios({
             method: 'POST',
-            baseURL: host,
+            baseURL: apiUrl,
             url: `/outbreaks/${id}/contacts/`,
             params: {
               access_token,
@@ -253,13 +253,13 @@ export function upsertContact(id, externalId, params, callback) {
  */
 export function listOutbreaks(params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
     return axios({
       method: 'GET',
-      baseURL: host,
+      baseURL: apiUrl,
       url: '/outbreaks',
       params: {
         access_token,
@@ -293,7 +293,7 @@ export function listOutbreaks(params, callback) {
  */
 export function getOutbreak(query, params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
@@ -301,7 +301,7 @@ export function getOutbreak(query, params, callback) {
 
     return axios({
       method: 'GET',
-      baseURL: host,
+      baseURL: apiUrl,
       url: '/outbreaks',
       params: {
         filter,
@@ -332,7 +332,7 @@ export function getOutbreak(query, params, callback) {
  */
 export function upsertOutbreak(params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const {
       externalId,
@@ -347,7 +347,7 @@ export function upsertOutbreak(params, callback) {
 
     return axios({
       method: 'GET',
-      baseURL: host,
+      baseURL: apiUrl,
       url: '/outbreaks',
       params: {
         filter,
@@ -379,7 +379,7 @@ export function upsertOutbreak(params, callback) {
           console.log('No outbreak found. Performing create.');
           return axios({
             method: 'POST',
-            baseURL: host,
+            baseURL: apiUrl,
             url: '/outbreaks',
             params: {
               access_token,
@@ -420,13 +420,13 @@ export function upsertOutbreak(params, callback) {
  */
 export function listCases(id, params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
     return axios({
       method: 'GET',
-      baseURL: host,
+      baseURL: apiUrl,
       url: `/outbreaks/${id}/cases`,
       params: {
         access_token,
@@ -467,14 +467,14 @@ export function listCases(id, params, callback) {
  */
 export function getCase(id, query, params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { headers, body, options, ...rest } = expandReferences(params)(state);
 
     const filter = JSON.stringify(query);
 
     return axios({
-      baseURL: host,
+      baseURL: apiUrl,
       url: `/outbreaks/${id}/cases`,
       method: 'GET',
       params: {
@@ -508,7 +508,7 @@ export function getCase(id, query, params, callback) {
  */
 export function upsertCase(id, externalId, params, callback) {
   return state => {
-    const { host, access_token } = state.configuration;
+    const { apiUrl, access_token } = state.configuration;
 
     const { data, headers, body, options, ...rest } = expandReferences(params)(
       state
@@ -520,7 +520,7 @@ export function upsertCase(id, externalId, params, callback) {
     const filter = JSON.stringify(query);
 
     return axios({
-      baseURL: host,
+      baseURL: apiUrl,
       url: `/outbreaks/${id}/cases`,
       method: 'GET',
       params: {
@@ -537,7 +537,7 @@ export function upsertCase(id, externalId, params, callback) {
           const caseId = response.data[0].id;
           return axios({
             method: 'PUT',
-            baseURL: host,
+            baseURL: apiUrl,
             url: `/outbreaks/${id}/cases/${caseId}`,
             params: {
               access_token,
@@ -557,7 +557,7 @@ export function upsertCase(id, externalId, params, callback) {
           console.log('No case found. Performing create.');
           return axios({
             method: 'POST',
-            baseURL: host,
+            baseURL: apiUrl,
             url: `/outbreaks/${id}/cases/`,
             params: {
               access_token,

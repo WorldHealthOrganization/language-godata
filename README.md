@@ -24,9 +24,9 @@ in the field, to adapt to the wide range of outbreak scenarios.
 
 ```json
 {
-  "email": "taylor@openfn.org",
+  "email": "mamadou@openfn.org",
   "password": "supersecret",
-  "host": "http://path.com/api"
+  "apiUrl": "https://www.who-godata.com/api"
 }
 ```
 
