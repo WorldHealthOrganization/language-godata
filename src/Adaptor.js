@@ -441,13 +441,16 @@ export function upsertCase(id, externalId, params, callback) {
       },
     })
       .then(response => {
-        if (response.data.length > 0) {
+        if (response.data.length > 1) {
+          console.log('Multiple cases found. Aborting upsert.');
+        }
+        else if (response.data.length === 1) {
           console.log('Case found. Performing update.');
-          const { visualId } = response.data[0];
+          const caseId = response.data[0].id;
           return axios({
             method: 'PATCH',
             baseURL: host,
-            url: `/outbreaks/${id}/cases/${visualId}`,
+            url: `/outbreaks/${id}/cases/${caseId}`,
             params: {
               access_token,
             },
