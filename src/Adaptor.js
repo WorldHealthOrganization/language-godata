@@ -151,6 +151,94 @@ export function getContact(id, query, params, callback) {
 }
 
 /**
+ * Upsert contact to godata
+ * @public
+ * @example
+ *  upsertContact("4dce-3eedce3-rd33", 'visualId', { data: {...}})
+ * @function
+ * @param {string} id - Outbreak id
+ * @param {string} externalId - External Id to match
+ * @param {object} params - an object with an externalId and some case data.
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function upsertContact(id, externalId, params, callback) {
+  return state => {
+    const { host, access_token } = state.configuration;
+
+    const { data, headers, body, options, ...rest } = expandReferences(params)(
+      state
+    );
+
+    const query = { where: {} };
+    query.where[externalId] = data[externalId];
+
+    const filter = JSON.stringify(query);
+
+    return axios({
+      baseURL: host,
+      url: `/outbreaks/${id}/contacts`,
+      method: 'GET',
+      params: {
+        filter,
+        access_token,
+      },
+    })
+      .then(response => {
+        if (response.data.length > 1) {
+          console.log('Multiple contacts found. Aborting upsert.');
+          console.log(response.data.length, 'contacts');
+        } else if (response.data.length === 1) {
+          console.log('Contact found. Performing update.');
+          const contactId = response.data[0].id;
+          return axios({
+            method: 'PATCH',
+            baseURL: host,
+            url: `/outbreaks/${id}/contacts/${contactId}`,
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });
+        } else {
+          console.log('No contact found. Performing create.');
+          return axios({
+            method: 'POST',
+            baseURL: host,
+            url: `/outbreaks/${id}/contacts/`,
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
  * Fetch the list of outbreaks
  * @public
  * @example
@@ -443,8 +531,8 @@ export function upsertCase(id, externalId, params, callback) {
       .then(response => {
         if (response.data.length > 1) {
           console.log('Multiple cases found. Aborting upsert.');
-        }
-        else if (response.data.length === 1) {
+          console.log(response.data.length, 'cases');
+        } else if (response.data.length === 1) {
           console.log('Case found. Performing update.');
           const caseId = response.data[0].id;
           return axios({
