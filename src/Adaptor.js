@@ -192,7 +192,7 @@ export function upsertContact(id, externalId, params, callback) {
           console.log('Contact found. Performing update.');
           const contactId = response.data[0].id;
           return axios({
-            method: 'PATCH',
+            method: 'PUT',
             baseURL: host,
             url: `/outbreaks/${id}/contacts/${contactId}`,
             params: {
@@ -536,7 +536,7 @@ export function upsertCase(id, externalId, params, callback) {
           console.log('Case found. Performing update.');
           const caseId = response.data[0].id;
           return axios({
-            method: 'PATCH',
+            method: 'PUT',
             baseURL: host,
             url: `/outbreaks/${id}/cases/${caseId}`,
             params: {
