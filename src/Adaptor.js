@@ -267,10 +267,9 @@ export function upsertOutbreak(params, callback) {
       },
     })
       .then(response => {
-        console.log('response', response.data);
         if (response.data.length > 0) {
           console.log('Outbreak found. Performing update.');
-          /*  return axios({
+          return axios({
             method: 'PATCH',
             baseURL: host,
             url: '/outbreaks',
@@ -287,14 +286,28 @@ export function upsertOutbreak(params, callback) {
             .catch(error => {
               console.log(error);
               return error;
-            });*/
-          return state;
+            });
         } else {
           console.log('No outbreak found. Performing create.');
-          // We create
-          return state;
+          return axios({
+            method: 'POST',
+            baseURL: host,
+            url: '/outbreaks',
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });
         }
-        return state;
       })
       .catch(error => {
         console.log(error);
@@ -400,24 +413,23 @@ export function getCase(id, query, params, callback) {
  *  upsertCase({externalId: "visualId", data: {...}})
  * @function
  * @param {string} id - Outbreak id
+ * @param {string} externalId - External Id to match
  * @param {object} params - an object with an externalId and some case data.
  * @param {function} callback - (Optional) Callback function
  * @returns {Operation}
  */
-export function upsertCase(id, params, callback) {
+export function upsertCase(id, externalId, params, callback) {
   return state => {
     const { host, access_token } = state.configuration;
 
-    const {
-      externalId,
-      data,
-      headers,
-      body,
-      options,
-      ...rest
-    } = expandReferences(params)(state);
+    const { data, headers, body, options, ...rest } = expandReferences(params)(
+      state
+    );
 
-    const filter = JSON.stringify({ where: { visualId: externalId } });
+    const externalIdValue = data[externalId];
+    const filter = JSON.stringify({
+      where: { externalId: externalIdValue },
+    });
 
     return axios({
       baseURL: host,
