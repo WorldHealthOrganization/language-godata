@@ -357,10 +357,10 @@ export function upsertOutbreak(params, callback) {
       .then(response => {
         if (response.data.length > 0) {
           console.log('Outbreak found. Performing update.');
+          const outbreakId = response.data[0].id;
           return axios({
-            method: 'PATCH',
-            baseURL: host,
-            url: '/outbreaks',
+            method: 'PUT',
+            url: `/outbreaks/${outbreakId}`,
             params: {
               access_token,
             },
