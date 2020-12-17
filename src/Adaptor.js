@@ -233,6 +233,77 @@ export function getOutbreak(query, params, callback) {
 }
 
 /**
+ * Upsert outbreak to godata
+ * @public
+ * @example
+ *  upsertOutbreak({externalId: "outbreak_id", data: {...}})
+ * @function
+ * @param {object} params - an object with an externalId and some case data.
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function upsertOutbreak(params, callback) {
+  return state => {
+    const { host, access_token } = state.configuration;
+
+    const {
+      externalId,
+      data,
+      headers,
+      body,
+      options,
+      ...rest
+    } = expandReferences(params)(state);
+
+    const filter = JSON.stringify({ where: { id: externalId } });
+
+    return axios({
+      method: 'GET',
+      baseURL: host,
+      url: '/outbreaks',
+      params: {
+        filter,
+        access_token,
+      },
+    })
+      .then(response => {
+        console.log('response', response.data);
+        if (response.data.length > 0) {
+          console.log('Outbreak found. Performing update.');
+          /*  return axios({
+            method: 'PATCH',
+            baseURL: host,
+            url: '/outbreaks',
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });*/
+          return state;
+        } else {
+          console.log('No outbreak found. Performing create.');
+          // We create
+          return state;
+        }
+        return state;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
  * Fetch the list of cases within a particular outbreak using its ID.
  * @public
  * @example
@@ -314,6 +385,92 @@ export function getCase(id, query, params, callback) {
         const nextState = composeNextState(state, response.data);
         if (callback) return callback(nextState);
         return nextState;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
+ * Upsert case to godata
+ * @public
+ * @example
+ *  upsertCase({externalId: "visualId", data: {...}})
+ * @function
+ * @param {string} id - Outbreak id
+ * @param {object} params - an object with an externalId and some case data.
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function upsertCase(id, params, callback) {
+  return state => {
+    const { host, access_token } = state.configuration;
+
+    const {
+      externalId,
+      data,
+      headers,
+      body,
+      options,
+      ...rest
+    } = expandReferences(params)(state);
+
+    const filter = JSON.stringify({ where: { visualId: externalId } });
+
+    return axios({
+      baseURL: host,
+      url: `/outbreaks/${id}/cases`,
+      method: 'GET',
+      params: {
+        filter,
+        access_token,
+      },
+    })
+      .then(response => {
+        if (response.data.length > 0) {
+          console.log('Case found. Performing update.');
+          const { visualId } = response.data;
+          return axios({
+            method: 'PATCH',
+            baseURL: host,
+            url: `/outbreaks/${id}/cases/${visualId}`,
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });
+        } else {
+          console.log('No case found. Performing create.');
+          return axios({
+            method: 'POST',
+            baseURL: host,
+            url: `/outbreaks/${id}/cases/`,
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });
+        }
       })
       .catch(error => {
         console.log(error);
