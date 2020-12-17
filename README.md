@@ -24,8 +24,9 @@ in the field, to adapt to the wide range of outbreak scenarios.
 
 ```json
 {
-  "username": "taylor@openfn.org",
-  "password": "supersecret"
+  "email": "taylor@openfn.org",
+  "password": "supersecret",
+  "host": "http://path.com/api"
 }
 ```
 
