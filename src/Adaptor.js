@@ -158,7 +158,7 @@ export function getContact(id, query, params, callback) {
  *  upsertContact("4dce-3eedce3-rd33", 'visualId', {
  *    data: {
  *      firstName: 'Luca',
- *      gender: 'male'
+ *      gender: 'male',
  *      'age:years': '20'
  *      ...
  *    },
@@ -505,7 +505,7 @@ export function getCase(id, query, params, callback) {
  * Upsert case to godata using an external id to mach a specific record
  * @public
  * @example
- *  upsertCase("4dce-3eedce3-rd33", 'visualId', 
+ *  upsertCase("4dce-3eedce3-rd33", 'visualId',
  *    { data: state => {
  *       const patient = state.data.body;
  *        return {
@@ -515,7 +515,8 @@ export function getCase(id, query, params, callback) {
  *          'age:years': patient.Age_in_year,
  *          gender: patient.Sex,
  *        };
- *    })
+ *    }
+ *  })
  * @function
  * @param {string} id - Outbreak id
  * @param {string} externalId - External Id to match
