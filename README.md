@@ -26,7 +26,7 @@ in the field, to adapt to the wide range of outbreak scenarios.
 {
   "email": "mamadou@openfn.org",
   "password": "supersecret",
-  "host": "https://www.who-godata.com/api"
+  "apiUrl": "https://www.who-godata.com/api"
 }
 ```
 
