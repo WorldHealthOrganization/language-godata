@@ -410,7 +410,7 @@ export function getCase(id, query, params, callback) {
  * Upsert case to godata
  * @public
  * @example
- *  upsertCase({externalId: "visualId", data: {...}})
+ *  upsertCase("4dce-3eedce3-rd33", 'visualId', { data: {...}})
  * @function
  * @param {string} id - Outbreak id
  * @param {string} externalId - External Id to match
@@ -426,10 +426,10 @@ export function upsertCase(id, externalId, params, callback) {
       state
     );
 
-    const externalIdValue = data[externalId];
-    const filter = JSON.stringify({
-      where: { externalId: externalIdValue },
-    });
+    const query = { where: {} };
+    query.where[externalId] = data[externalId];
+
+    const filter = JSON.stringify(query);
 
     return axios({
       baseURL: host,
@@ -443,7 +443,7 @@ export function upsertCase(id, externalId, params, callback) {
       .then(response => {
         if (response.data.length > 0) {
           console.log('Case found. Performing update.');
-          const { visualId } = response.data;
+          const { visualId } = response.data[0];
           return axios({
             method: 'PATCH',
             baseURL: host,
