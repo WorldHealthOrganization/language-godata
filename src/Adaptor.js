@@ -70,8 +70,9 @@ function logout(state) {
  * Fetch the list of contacts within a particular outbreak using its ID.
  * @public
  * @example
- *  listContacts("343d-dc3e", {}, state => {
- *    console.log(state);
+ *  listContacts("343d-dc3e", // Outbreak Id
+ *    {}, state => {
+ *       console.log(state);
  *    return state;
  *  });
  * @function
@@ -151,10 +152,17 @@ export function getContact(id, query, params, callback) {
 }
 
 /**
- * Upsert contact to godata
+ * Upsert contact to godata using an external id to match a specific record.
  * @public
  * @example
- *  upsertContact("4dce-3eedce3-rd33", 'visualId', { data: {...}})
+ *  upsertContact("4dce-3eedce3-rd33", 'visualId', {
+ *    data: {
+ *      firstName: 'Luca',
+ *      gender: 'male'
+ *      'age:years': '20'
+ *      ...
+ *    },
+ *  })
  * @function
  * @param {string} id - Outbreak id
  * @param {string} externalId - External Id to match
@@ -324,7 +332,7 @@ export function getOutbreak(query, params, callback) {
  * Upsert outbreak to godata
  * @public
  * @example
- *  upsertOutbreak({externalId: "outbreak_id", data: {...}})
+ *  upsertOutbreak({externalId: "3dec33-ede3", data: {...}})
  * @function
  * @param {object} params - an object with an externalId and some case data.
  * @param {function} callback - (Optional) Callback function
@@ -457,7 +465,6 @@ export function listCases(id, params, callback) {
  *      return state;
  *    }
  * );
-
  * @function
  * @param {string} id - Outbreak id
  * @param {object} query - An object with a query filter parameter
@@ -495,10 +502,20 @@ export function getCase(id, query, params, callback) {
 }
 
 /**
- * Upsert case to godata
+ * Upsert case to godata using an external id to mach a specific record
  * @public
  * @example
- *  upsertCase("4dce-3eedce3-rd33", 'visualId', { data: {...}})
+ *  upsertCase("4dce-3eedce3-rd33", 'visualId', 
+ *    { data: state => {
+ *       const patient = state.data.body;
+ *        return {
+ *          firstName: patient.Patient_name.split(' ')[0],
+ *          lastName: patient.Patient_name.split(' ')[1],
+ *          visualId: patient.Case_ID,
+ *          'age:years': patient.Age_in_year,
+ *          gender: patient.Sex,
+ *        };
+ *    })
  * @function
  * @param {string} id - Outbreak id
  * @param {string} externalId - External Id to match
