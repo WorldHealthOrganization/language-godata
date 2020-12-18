@@ -41,6 +41,9 @@ exports.upsertOutbreak = upsertOutbreak;
 exports.listCases = listCases;
 exports.getCase = getCase;
 exports.upsertCase = upsertCase;
+exports.listLocations = listLocations;
+exports.getLocation = getLocation;
+exports.upsertLocation = upsertLocation;
 Object.defineProperty(exports, "alterState", {
   enumerable: true,
   get: function get() {
@@ -281,7 +284,7 @@ function getContact(id, query, params, callback) {
  *  upsertContact("4dce-3eedce3-rd33", 'visualId', {
  *    data: {
  *      firstName: 'Luca',
- *      gender: 'male'
+ *      gender: 'male',
  *      'age:years': '20'
  *      ...
  *    },
@@ -505,6 +508,7 @@ function upsertOutbreak(params, callback) {
         var outbreakId = response.data[0].id;
         return (0, _axios["default"])({
           method: 'PUT',
+          baseURL: apiUrl,
           url: "/outbreaks/".concat(outbreakId),
           params: {
             access_token: access_token
@@ -645,7 +649,7 @@ function getCase(id, query, params, callback) {
  * Upsert case to godata using an external id to mach a specific record
  * @public
  * @example
- *  upsertCase("4dce-3eedce3-rd33", 'visualId', 
+ *  upsertCase("4dce-3eedce3-rd33", 'visualId',
  *    { data: state => {
  *       const patient = state.data.body;
  *        return {
@@ -655,7 +659,8 @@ function getCase(id, query, params, callback) {
  *          'age:years': patient.Age_in_year,
  *          gender: patient.Sex,
  *        };
- *    })
+ *    }
+ *  })
  * @function
  * @param {string} id - Outbreak id
  * @param {string} externalId - External Id to match
@@ -693,8 +698,7 @@ function upsertCase(id, externalId, params, callback) {
       }
     }).then(function (response) {
       if (response.data.length > 1) {
-        console.log('Multiple cases found. Aborting upsert.');
-        console.log(response.data.length, 'cases');
+        console.log(response.data.length, 'cases found; aborting upsert.');
       } else if (response.data.length === 1) {
         console.log('Case found. Performing update.');
         var caseId = response.data[0].id;
@@ -738,6 +742,181 @@ function upsertCase(id, externalId, params, callback) {
       return error;
     });
   };
+}
+/**
+ * Fetch the list of locations
+ * @public
+ * @example
+ *  listLocations({}, state => {
+ *    console.log(state.data);
+ *    return state;
+ *  });
+ * @function
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+
+
+function listLocations(params, callback) {
+  return function (state) {
+    var _state$configuration12 = state.configuration,
+        apiUrl = _state$configuration12.apiUrl,
+        access_token = _state$configuration12.access_token;
+
+    var _expandReferences10 = (0, _languageCommon.expandReferences)(params)(state),
+        headers = _expandReferences10.headers,
+        body = _expandReferences10.body,
+        options = _expandReferences10.options,
+        rest = _objectWithoutProperties(_expandReferences10, ["headers", "body", "options"]);
+
+    return (0, _axios["default"])({
+      method: 'GET',
+      baseURL: apiUrl,
+      url: '/locations',
+      params: {
+        access_token: access_token
+      }
+    }).then(function (response) {
+      var nextState = (0, _languageCommon.composeNextState)(state, response.data);
+      if (callback) return callback(nextState);
+      return nextState;
+    })["catch"](function (error) {
+      console.log(error);
+      return error;
+    });
+  };
+}
+/**
+ * Get a specific location from a query filter
+ * @public
+ * @example
+ *  getLocation({"where":{"name": "30 DE OCTUBRE"}}, {}, state => {
+ *    console.log(state.data);
+ *    return state;
+ *  });
+ * @function
+ * @param {object} query - An object with a query filter parameter
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+
+
+function getLocation(query, params, callback) {
+  return function (state) {
+    var _state$configuration13 = state.configuration,
+        apiUrl = _state$configuration13.apiUrl,
+        access_token = _state$configuration13.access_token;
+
+    var _expandReferences11 = (0, _languageCommon.expandReferences)(params)(state),
+        headers = _expandReferences11.headers,
+        body = _expandReferences11.body,
+        options = _expandReferences11.options,
+        rest = _objectWithoutProperties(_expandReferences11, ["headers", "body", "options"]);
+
+    var filter = JSON.stringify(query);
+    return (0, _axios["default"])({
+      method: 'GET',
+      baseURL: apiUrl,
+      url: '/locations',
+      params: {
+        filter: filter,
+        access_token: access_token
+      }
+    }).then(function (response) {
+      var nextState = (0, _languageCommon.composeNextState)(state, response.data);
+      if (callback) return callback(nextState);
+      return nextState;
+    })["catch"](function (error) {
+      console.log(error);
+      return error;
+    });
+  };
+}
+/**
+ * Upsert location to godata
+ * @public
+ * @example
+ *  upsertLocation({externalId: "3dec33-ede3", data: {...}})
+ * @function
+ * @param {object} params - an object with an externalId and some case data.
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+
+
+function upsertLocation(params, callback) {
+  return function (state) {
+    var _state$configuration14 = state.configuration,
+        apiUrl = _state$configuration14.apiUrl,
+        access_token = _state$configuration14.access_token;
+
+    var _expandReferences12 = (0, _languageCommon.expandReferences)(params)(state),
+        externalId = _expandReferences12.externalId,
+        data = _expandReferences12.data,
+        headers = _expandReferences12.headers,
+        body = _expandReferences12.body,
+        options = _expandReferences12.options,
+        rest = _objectWithoutProperties(_expandReferences12, ["externalId", "data", "headers", "body", "options"]);
+
+    var filter = JSON.stringify({
+      where: {
+        id: externalId
+      }
+    });
+    return (0, _axios["default"])({
+      method: 'GET',
+      baseURL: apiUrl,
+      url: '/locations',
+      params: {
+        filter: filter,
+        access_token: access_token
+      }
+    }).then(function (response) {
+      if (response.data.length > 0) {
+        console.log('Location found. Performing update.');
+        var locationId = response.data[0].id;
+        return (0, _axios["default"])({
+          method: 'PUT',
+          baseURL: apiUrl,
+          url: "/locations/".concat(locationId),
+          params: {
+            access_token: access_token
+          },
+          data: data
+        }).then(function (response) {
+          var nextState = (0, _languageCommon.composeNextState)(state, response.data);
+          if (callback) return callback(nextState);
+          return nextState;
+        })["catch"](function (error) {
+          console.log(error);
+          return error;
+        });
+      } else {
+        console.log('No location found. Performing create.');
+        return (0, _axios["default"])({
+          method: 'POST',
+          baseURL: apiUrl,
+          url: '/locations',
+          params: {
+            access_token: access_token
+          },
+          data: data
+        }).then(function (response) {
+          var nextState = (0, _languageCommon.composeNextState)(state, response.data);
+          if (callback) return callback(nextState);
+          return nextState;
+        })["catch"](function (error) {
+          console.log(error);
+          return error;
+        });
+      }
+    })["catch"](function (error) {
+      console.log(error);
+      return error;
+    });
+  };
 } // Note that we expose the entire axios package to the user here.
 
 
@@ -752,13 +931,13 @@ exports.axios = _axios["default"]; // What functions do you want from the common
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#getCase">getCase</a></li><li><a href="global.html#getContact">getContact</a></li><li><a href="global.html#getOutbreak">getOutbreak</a></li><li><a href="global.html#listCases">listCases</a></li><li><a href="global.html#listContacts">listContacts</a></li><li><a href="global.html#listOutbreaks">listOutbreaks</a></li><li><a href="global.html#upsertCase">upsertCase</a></li><li><a href="global.html#upsertContact">upsertContact</a></li><li><a href="global.html#upsertOutbreak">upsertOutbreak</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#getCase">getCase</a></li><li><a href="global.html#getContact">getContact</a></li><li><a href="global.html#getLocation">getLocation</a></li><li><a href="global.html#getOutbreak">getOutbreak</a></li><li><a href="global.html#listCases">listCases</a></li><li><a href="global.html#listContacts">listContacts</a></li><li><a href="global.html#listLocations">listLocations</a></li><li><a href="global.html#listOutbreaks">listOutbreaks</a></li><li><a href="global.html#upsertCase">upsertCase</a></li><li><a href="global.html#upsertContact">upsertContact</a></li><li><a href="global.html#upsertLocation">upsertLocation</a></li><li><a href="global.html#upsertOutbreak">upsertOutbreak</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Dec 17 2020 21:21:06 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Dec 18 2020 16:16:36 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>
