@@ -368,6 +368,7 @@ export function upsertOutbreak(params, callback) {
           const outbreakId = response.data[0].id;
           return axios({
             method: 'PUT',
+            baseURL: apiUrl,
             url: `/outbreaks/${outbreakId}`,
             params: {
               access_token,
@@ -548,8 +549,7 @@ export function upsertCase(id, externalId, params, callback) {
     })
       .then(response => {
         if (response.data.length > 1) {
-          console.log('Multiple cases found. Aborting upsert.');
-          console.log(response.data.length, 'cases');
+          console.log(response.data.length, 'cases found; aborting upsert.');
         } else if (response.data.length === 1) {
           console.log('Case found. Performing update.');
           const caseId = response.data[0].id;
@@ -577,6 +577,173 @@ export function upsertCase(id, externalId, params, callback) {
             method: 'POST',
             baseURL: apiUrl,
             url: `/outbreaks/${id}/cases/`,
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
+ * Fetch the list of locations
+ * @public
+ * @example
+ *  listLocations({}, state => {
+ *    console.log(state.data);
+ *    return state;
+ *  });
+ * @function
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function listLocations(params, callback) {
+  return state => {
+    const { apiUrl, access_token } = state.configuration;
+
+    const { headers, body, options, ...rest } = expandReferences(params)(state);
+
+    return axios({
+      method: 'GET',
+      baseURL: apiUrl,
+      url: '/locations',
+      params: {
+        access_token,
+      },
+    })
+      .then(response => {
+        const nextState = composeNextState(state, response.data);
+        if (callback) return callback(nextState);
+        return nextState;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
+ * Get a specific location from a query filter
+ * @public
+ * @example
+ *  getLocation({"where":{"name": "30 DE OCTUBRE"}}, {}, state => {
+ *    console.log(state.data);
+ *    return state;
+ *  });
+ * @function
+ * @param {object} query - An object with a query filter parameter
+ * @param {object} params - Options, Headers parameters
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function getLocation(query, params, callback) {
+  return state => {
+    const { apiUrl, access_token } = state.configuration;
+
+    const { headers, body, options, ...rest } = expandReferences(params)(state);
+
+    const filter = JSON.stringify(query);
+
+    return axios({
+      method: 'GET',
+      baseURL: apiUrl,
+      url: '/locations',
+      params: {
+        filter,
+        access_token,
+      },
+    })
+      .then(response => {
+        const nextState = composeNextState(state, response.data);
+        if (callback) return callback(nextState);
+        return nextState;
+      })
+      .catch(error => {
+        console.log(error);
+        return error;
+      });
+  };
+}
+
+/**
+ * Upsert location to godata
+ * @public
+ * @example
+ *  upsertLocation({externalId: "3dec33-ede3", data: {...}})
+ * @function
+ * @param {object} params - an object with an externalId and some case data.
+ * @param {function} callback - (Optional) Callback function
+ * @returns {Operation}
+ */
+export function upsertLocation(params, callback) {
+  return state => {
+    const { apiUrl, access_token } = state.configuration;
+
+    const {
+      externalId,
+      data,
+      headers,
+      body,
+      options,
+      ...rest
+    } = expandReferences(params)(state);
+
+    const filter = JSON.stringify({ where: { id: externalId } });
+
+    return axios({
+      method: 'GET',
+      baseURL: apiUrl,
+      url: '/locations',
+      params: {
+        filter,
+        access_token,
+      },
+    })
+      .then(response => {
+        if (response.data.length > 0) {
+          console.log('Location found. Performing update.');
+          const locationId = response.data[0].id;
+          return axios({
+            method: 'PUT',
+            baseURL: apiUrl,
+            url: `/locations/${locationId}`,
+            params: {
+              access_token,
+            },
+            data,
+          })
+            .then(response => {
+              const nextState = composeNextState(state, response.data);
+              if (callback) return callback(nextState);
+              return nextState;
+            })
+            .catch(error => {
+              console.log(error);
+              return error;
+            });
+        } else {
+          console.log('No location found. Performing create.');
+          return axios({
+            method: 'POST',
+            baseURL: apiUrl,
+            url: '/locations',
             params: {
               access_token,
             },
