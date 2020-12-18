@@ -158,6 +158,49 @@ upsertContact('4dce-3eedce3-rd33', 'visualId', {
 });
 ```
 
+## Fetch the list of locations
+
+This function is used to fetch the list of locations.
+
+```js
+listLocations({}, state => {
+  console.log(state);
+  return state;
+});
+```
+
+## Get a specific location
+
+This function can be used to get one specific location. A filtering mechanism can specify a criteria to match.
+
+```js
+getLocation({ where: { name: '30 DE MAYO' } }, {}, state => {
+  console.log(state.data);
+  return state;
+});
+```
+
+## Insert or Update a location using a unique id as a key
+
+This function is used to either update a location if matched or insert a new.
+
+```js
+upsertLocation({
+  externalId: '4dce-3eedce3-rd33',
+  data: {
+    name: '30 DE DECIEMBRE',
+    synonyms: [],
+    identifiers: [],
+    active: true,
+    populationDensity: 0,
+    geoLocation: {
+      lat: -45.343244,
+      lng: -67.193873,
+    },
+  },
+});
+```
+
 ## Development
 
 Clone the repo, run `npm install`.
