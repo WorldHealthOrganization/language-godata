@@ -182,11 +182,10 @@ getLocation({ where: { name: '30 DE MAYO' } }, {}, state => {
 
 ## Insert or Update a location using a unique id as a key
 
-This function is used to either update a location if matched or insert a new.
+This function is used to either update a location if matched or insert a new. A custom `externalId` can be provided.
 
 ```js
-upsertLocation({
-  externalId: '4dce-3eedce3-rd33',
+upsertLocation('name', {
   data: {
     name: '30 DE DECIEMBRE',
     synonyms: [],
