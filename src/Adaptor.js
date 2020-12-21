@@ -50,7 +50,10 @@ function login(state) {
   }).then(response => {
     console.log('Authentication succeeded.');
     const { id } = response.data;
-    return { ...state, configuration: { apiUrl, access_token: id } };
+    return {
+      ...state,
+      configuration: { ...state.configuration, apiUrl, access_token: id },
+    };
   });
 }
 
