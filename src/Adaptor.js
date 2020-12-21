@@ -686,26 +686,25 @@ export function getLocation(query, params, callback) {
  * Upsert location to godata
  * @public
  * @example
- *  upsertLocation({externalId: "3dec33-ede3", data: {...}})
+ *  upsertLocation('name', { data: {...}})
  * @function
+ * @param {string} externalId - External Id to match
  * @param {object} params - an object with an externalId and some case data.
  * @param {function} callback - (Optional) Callback function
  * @returns {Operation}
  */
-export function upsertLocation(params, callback) {
+export function upsertLocation(externalId, params, callback) {
   return state => {
     const { apiUrl, access_token } = state.configuration;
 
-    const {
-      externalId,
-      data,
-      headers,
-      body,
-      options,
-      ...rest
-    } = expandReferences(params)(state);
+    const { data, headers, body, options, ...rest } = expandReferences(params)(
+      state
+    );
 
-    const filter = JSON.stringify({ where: { id: externalId } });
+    const query = { where: {} };
+    query.where[externalId] = data[externalId];
+
+    const filter = JSON.stringify(query);
 
     return axios({
       method: 'GET',
@@ -717,7 +716,13 @@ export function upsertLocation(params, callback) {
       },
     })
       .then(response => {
-        if (response.data.length > 0) {
+        if (response.data.length > 1) {
+          console.log(
+            response.data.length,
+            'locations found; aborting upsert.'
+          );
+          return response;
+        } else if (response.data.length === 1) {
           console.log('Location found. Performing update.');
           const locationId = response.data[0].id;
           return axios({
